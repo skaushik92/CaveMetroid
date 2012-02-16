@@ -1,28 +1,46 @@
 
 package model.physics.collision;
 
-
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import model.physics.Position;
 
 public class CollisionShape
 {
-	private Position	centerPosition;
-	private Shape		shape;
-	
-	public CollisionShape () {
-		centerPosition = Position.ZERO;
+	private Shape	shape;
+
+
+
+	public CollisionShape ( )
+	{
 		shape = new Rectangle ( );
 	}
 
-	
-	public Shape getShape () {
+
+
+	public CollisionShape ( Rectangle rectangle )
+	{
+		shape = rectangle;
+	}
+
+
+
+	public Shape getShape ( )
+	{
 		return shape;
 	}
-	
-	public Position getPosition () {
-		return centerPosition;
+
+
+
+	public float getHeight ( )
+	{
+		return ((Rectangle) shape).height;
+	}
+
+
+
+	public float getWidth ( )
+	{
+		return ((Rectangle) shape).width;
 	}
 }

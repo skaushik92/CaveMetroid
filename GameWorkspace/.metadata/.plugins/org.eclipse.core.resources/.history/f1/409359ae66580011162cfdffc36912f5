@@ -1,0 +1,56 @@
+package model.entities.blocks;
+
+import java.util.EnumSet;
+
+import model.GameState;
+import model.graphics.Sprite;
+import model.time.GameTime;
+import controller.input.InputChange;
+
+public class GroundBlock extends Block
+{
+
+	@Override
+	public Sprite getSprite ( )
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public int zValue ( )
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+	@Override
+	public void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+
+
+	@Override
+	public String blockType ( )
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public EnumSet < BlockAttributes > getAttributes ( )
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

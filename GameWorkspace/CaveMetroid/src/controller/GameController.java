@@ -46,7 +46,6 @@ public class GameController implements Runnable
 	public void run ( )
 	{
 		Log.d ( "Program State", "GameController.run" );
-
 		while ( true )
 		{
 			/*
@@ -55,13 +54,10 @@ public class GameController implements Runnable
 			 * into the view using the sprite within each
 			 * entity.
 			 */
-
 			GameState currState = model.getState ( );
 			Frame currFrame = generateFrame ( currState );
-
 			view.setFrame ( currFrame );
 			view.repaint ( );
-			rest ( );
 		}
 	}
 
@@ -70,9 +66,7 @@ public class GameController implements Runnable
 	private Frame generateFrame ( GameState state )
 	{
 		Log.v ( "Program State", "GameController.generateFrame" );
-
 		Position topLeftPos = state.getCamera ( ).getPosition ( );
-
 		Frame f = new Frame ( topLeftPos );
 		for (ViewableEntity e : state.viewableEntities ( ))
 		{
@@ -100,18 +94,5 @@ public class GameController implements Runnable
 	public KeyListener getKeyboardListener ( )
 	{
 		return KeyboardManager.getInstance ( ).getKeyListener ( );
-	}
-
-
-
-	private void rest ( )
-	{
-		try
-		{
-			Thread.sleep ( 2 );
-		}
-		catch ( Exception e )
-		{
-		}
 	}
 }

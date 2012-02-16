@@ -1,0 +1,133 @@
+
+package model.physics;
+
+public class Vector
+{
+	public static final Vector	ZERO				= new Vector ( 0, 0 );
+	public static final Vector	Y_AXIS			= new Vector ( 0, 1 );
+	public static final Vector	X_AXIS			= new Vector ( 1, 0 );
+	
+
+	private float				x, y;
+
+	private static final float	EQUALITY_THRESHOLD	= 0.01f;
+
+
+
+	public Vector ( float xValue, float yValue )
+	{
+		x = xValue;
+		y = yValue;
+	}
+
+
+
+	public Vector ( double xValue, double yValue )
+	{
+		x = (float) xValue;
+		y = (float) yValue;
+	}
+
+
+
+	public Vector plus ( Vector anotherVector )
+	{
+		return new Vector ( x + anotherVector.x, y + anotherVector.y );
+	}
+
+
+
+	public float magnitude ( )
+	{
+		return (float) Math.sqrt ( magnitudeSquared ( ) );
+	}
+
+
+
+	public float magnitudeSquared ( )
+	{
+		return x * x + y * y;
+	}
+
+
+
+	public Vector minus ( Vector anotherVector )
+	{
+		return new Vector ( x - anotherVector.x, y - anotherVector.y );
+	}
+
+
+
+	public Vector scale ( float factor )
+	{
+		return new Vector ( factor * x, factor * y );
+	}
+
+
+
+	public float dot ( Vector anotherVector )
+	{
+		return x * anotherVector.x + y * anotherVector.y;
+	}
+
+
+
+	/**
+	 * Performs linear interpolation between two vectors.
+	 * 
+	 * @param v1
+	 *             First vector. If percent == 0, this vector
+	 *             is returned.
+	 * @param v2
+	 *             Second vector. If percent == 1, this vector
+	 *             is returned.
+	 * @param percent
+	 *             The percentage by which the new vector
+	 *             should resemble v2 from v1.
+	 * @return The linearly interpolated vector.
+	 */
+
+	public Vector linearInterpolate ( Vector v1, Vector v2, float percent )
+	{
+		float xDiff = v2.x - v1.x;
+		float yDiff = v2.y - v1.y;
+
+		float newX = v1.x + percent * xDiff;
+		float newY = v1.y + percent * yDiff;
+
+		return new Vector ( newX, newY );
+	}
+
+
+
+	public float getX ( )
+	{
+		return x;
+	}
+
+
+
+	public float getY ( )
+	{
+		return y;
+	}
+
+
+
+	public boolean equals ( Object o )
+	{
+		if ( o instanceof Vector )
+		{
+			Vector v = (Vector) o;
+			return this.minus ( v ).magnitude ( ) < EQUALITY_THRESHOLD;
+		}
+		return false;
+	}
+
+
+
+	public String toString ( )
+	{
+		return "<" + String.format ( "%.3f", x ) + ", " + String.format ( "%.3f", y ) + ">";
+	}
+}

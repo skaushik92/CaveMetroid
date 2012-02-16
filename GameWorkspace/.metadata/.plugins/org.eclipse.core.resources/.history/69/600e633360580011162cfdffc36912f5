@@ -1,0 +1,14 @@
+package model.entities.blocks
+
+public class BlockCoordinate
+{
+	int	row;
+	int	col;
+
+
+	public BlockCoordinate ( int row, int column )
+	{
+		this.row = row;
+		this.col = column;
+	}
+}

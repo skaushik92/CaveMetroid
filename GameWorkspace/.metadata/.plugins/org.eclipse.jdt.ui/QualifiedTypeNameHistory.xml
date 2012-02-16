@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="model.entities.blocks.BackgroundBlock"/>
+<fullyQualifiedTypeName name="java.util.Collections"/>
+<fullyQualifiedTypeName name="java.util.LinkedHashSet"/>
+<fullyQualifiedTypeName name="model.entities.blocks.BlockManager.Coordinate"/>
+<fullyQualifiedTypeName name="model.entities.blocks.BlockCoordinate"/>
+<fullyQualifiedTypeName name="model.entities.blocks.BlockManager"/>
+<fullyQualifiedTypeName name="model.entities.blocks.BlockAttributes"/>
+<fullyQualifiedTypeName name="java.util.EnumSet"/>
+<fullyQualifiedTypeName name="model.graphics.Animation"/>
+<fullyQualifiedTypeName name="io.ContentManager"/>
+<fullyQualifiedTypeName name="model.entities.blocks.GroundBlock"/>
+<fullyQualifiedTypeName name="model.physics.Position"/>
+<fullyQualifiedTypeName name="log.Log"/>
+<fullyQualifiedTypeName name="java.awt.Rectangle"/>
+<fullyQualifiedTypeName name="java.awt.Dimension"/>
+</qualifiedTypeNameHistroy>

@@ -12,6 +12,7 @@ import log.Log;
 import model.entities.CameraEntity;
 import model.entities.Entity;
 import model.entities.ViewableEntity;
+import model.entities.blocks.BackgroundBlock;
 import model.entities.blocks.BlockManager;
 import model.entities.gameentities.Player;
 import model.managers.EntityManager;
@@ -30,10 +31,6 @@ public class GameState
 
 	LevelManager				lvlManager;
 
-	BlockManager				blockManager;
-	public EntityManager		entityManager;
-
-
 
 	public GameState ( )
 	{
@@ -45,9 +42,6 @@ public class GameState
 	public GameState ( int levelWidth, int levelHeight )
 	{
 		Log.v ( "Program State", "GameState.Constructor(2)" );
-
-		entityManager = new EntityManager ( );
-		blockManager = new BlockManager ( levelWidth, levelHeight, entityManager );
 	}
 
 
@@ -58,10 +52,7 @@ public class GameState
 
 		GameState newState = new GameState ( );
 
-		newState.entityManager = entityManager;
-		newState.blockManager = blockManager;
-
-		newState.entityManager.update ( gameTime, inputChange, this );
+		EntityManager.update ( gameTime, inputChange, this );
 
 		return newState;
 	}
@@ -70,14 +61,14 @@ public class GameState
 
 	public List < Entity > entities ( )
 	{
-		return new ArrayList < Entity > ( entityManager.allOfType ( Entity.class ) );
+		return new ArrayList < Entity > ( EntityManager.allOfType ( Entity.class ) );
 	}
 
 
 
 	public Player getPlayer ( )
 	{
-		return entityManager.getSingleton ( Player.class );
+		return EntityManager.getSingleton ( Player.class );
 	}
 
 
@@ -93,11 +84,11 @@ public class GameState
 	{
 		ArrayList < ViewableEntity > entities = new ArrayList < ViewableEntity > ( );
 
-		CameraEntity ce = entityManager.getSingleton ( CameraEntity.class );
+		CameraEntity ce = EntityManager.getSingleton ( CameraEntity.class );
 		Position cameraPos = ce.getPosition ( );
 
-		entities.addAll ( blockManager.getViewableBlocks ( cameraPos ) );
-		entities.addAll ( entityManager.allOfType ( Player.class ) );
+		entities.addAll ( BlockManager.getViewableBlocks ( cameraPos ) );
+		entities.addAll ( EntityManager.allOfTypeExcept ( ViewableEntity.class, BackgroundBlock.class ) );
 
 		return entities;
 	}
@@ -106,20 +97,6 @@ public class GameState
 
 	public CameraEntity getCamera ( )
 	{
-		return entityManager.getSingleton ( CameraEntity.class );
-	}
-
-
-
-	public EntityManager getEntityManager ( )
-	{
-		return entityManager;
-	}
-
-
-
-	public BlockManager getBlockManager ( )
-	{
-		return blockManager;
+		return EntityManager.getSingleton ( CameraEntity.class );
 	}
 }

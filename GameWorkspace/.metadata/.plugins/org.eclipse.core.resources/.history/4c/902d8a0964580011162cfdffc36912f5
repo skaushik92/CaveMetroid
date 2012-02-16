@@ -1,0 +1,121 @@
+
+package model.entities.blocks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import log.Log;
+import model.managers.EntityManager;
+import model.physics.Position;
+
+
+public class BlockManager
+{
+
+	// / Blocks that don't need updates:
+	// BackgroundBlocks
+	// GroundBlocks
+
+	// / Blocks that do need updates:
+	// DisappearingBlocks
+	// DestructableBlocks
+
+	private static BlockCollection [][]	grid;
+
+	private static int					width;
+	private static int					height;
+
+
+
+	public static void initialize ( int gridWidth, int gridHeight )
+	{
+		width = gridWidth;
+		height = gridHeight;
+
+		grid = new BlockCollection [ height ] [ width ];
+
+		for (int row = 0; row < height; row++ )
+		{
+			grid[ row ] = new BlockCollection [ width ];
+			for (int col = 0; col < width; col++ )
+			{
+				grid[ row ][ col ] = new BlockCollection ( );
+			}
+		}
+	}
+
+
+
+	private static boolean validCoordinate ( int col, int row )
+	{
+		return col >= 0 && col < width && row >= 0 && row < height;
+	}
+
+
+
+	public static void setBlock ( int col, int row, Class < Block > blockType )
+	{
+		if ( validCoordinate ( col, row ) )
+			grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType ) );
+		else
+		{
+			Log.e ( "Block Setting Error", "Block of type " + blockType.getSimpleName ( ) + " cannot be created at (" + col + ", " + row + ")!" );
+		}
+	}
+
+
+
+	/**
+	 * bottomLeftx and bottomLefty are inclusive. topRightx and
+	 * topRighty are exclusive;
+	 */
+
+	public static void setBlocksInRegion ( int bottomLeftCol, int bottomLeftRow, int topRightCol, int topRightRow, Class < ? extends Block > blockType, Object... blockParameters )
+	{
+		if ( validCoordinate ( bottomLeftCol, bottomLeftRow ) && validCoordinate ( topRightCol - 1, topRightRow - 1 ) )
+		{
+			for (int row = bottomLeftRow; row < topRightRow; row++ )
+				for (int col = bottomLeftCol; col < topRightCol; col++ )
+					grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
+		}
+	}
+
+
+
+	public static List < Block > getViewableBlocks ( Position cameraPos )
+	{
+		float posX = cameraPos.getX ( );
+		float upperX = ( posX + view.Constants.WINDOW_WIDTH ) - 1;
+
+		float posY = cameraPos.getY ( ) - 1;
+		float lowerY = ( posY - view.Constants.WINDOW_HEIGHT );
+
+		BlockCoordinate bottomLeft = coordinateAtWorldPosition ( new Position ( posX, lowerY ) );
+		BlockCoordinate topRight = coordinateAtWorldPosition ( new Position ( upperX, posY ) );
+
+		List < Block > blocksToDraw = new ArrayList < Block > ( );
+
+		for (int row = bottomLeft.row; row <= topRight.row; row++ )
+		{
+			for (int col = bottomLeft.col; col <= topRight.col; col++ )
+			{
+				if ( validCoordinate ( col, row ) )
+					blocksToDraw.addAll ( grid[ row ][ col ].getBlocks ( ) );
+			}
+		}
+
+		return blocksToDraw;
+	}
+
+
+
+	public static BlockCoordinate coordinateAtWorldPosition ( Position worldPos )
+	{
+		int row = 0, col = 0;
+
+		col = ( (int) worldPos.getX ( ) ) / 50;
+		row = ( (int) worldPos.getY ( ) ) / 50;
+
+		return new BlockCoordinate ( col, row );
+	}
+}

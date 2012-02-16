@@ -16,7 +16,6 @@ public class Game
 	 * consistency within all classes.
 	 */
 	private static final long	serialVersionUID	= Constants.serialVersionUID;
-
 	private GameModel			model;
 	private GameView			view;
 	private GameController		controller;
@@ -66,8 +65,7 @@ public class Game
 
 		// The window will contain the view of the game
 
-		view.directInputToController();
-		
+		view.directInputToController ( );
 		window = new GameWindow ( view );
 		window.setVisible ( true );
 
@@ -80,7 +78,7 @@ public class Game
 		modelThread = new Thread ( model );
 		modelThread.setName ( "Model Thread" );
 		modelThread.setPriority ( 10 );
-		
+
 		/*
 		 * The controller runs on a separate thread accessing
 		 * the model and modifying the view
@@ -89,7 +87,7 @@ public class Game
 		controllerThread = new Thread ( controller );
 		controllerThread.setName ( "Controller Thread" );
 		controllerThread.setPriority ( 1 );
-		
+
 		/*
 		 * The view does not run on a separate thread because
 		 * it should only be updated when the controller wants
@@ -106,11 +104,11 @@ public class Game
 	{
 		Log.v ( "Program State", "Game.start" );
 		Log.v ( "Thread Info", "modelThread.start" );
-		
 		modelThread.start ( );
 		Log.v ( "Thread Info", "controllerThread.start" );
 		controllerThread.start ( );
 	}
+
 	/*
 	 * public void pause () { modelThread.suspend();
 	 * controllerThread.suspend(); } public void resume () {

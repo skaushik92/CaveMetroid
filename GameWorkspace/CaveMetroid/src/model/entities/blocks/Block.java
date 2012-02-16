@@ -1,6 +1,8 @@
 
 package model.entities.blocks;
 
+import java.util.EnumSet;
+
 import model.entities.ViewableEntity;
 import model.physics.Position;
 
@@ -35,4 +37,8 @@ public abstract class Block implements ViewableEntity
 
 
 	public abstract String blockType ( );
+
+
+
+	public abstract EnumSet < BlockAttributes > getAttributes ( );
 }

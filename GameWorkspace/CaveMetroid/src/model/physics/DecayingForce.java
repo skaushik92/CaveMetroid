@@ -46,13 +46,13 @@ public class DecayingForce extends Force implements Entity
 
 
 	@Override
-	public void update ( GameTime gameTime, InputChange inputChange , GameState gameState )
+	public void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
 	{
 		float secs = gameTime.getElapsedTime ( ).getSeconds ( );
 		this.getForceVector ( ).scale ( secs * ( 1 - factor ) );
 	}
-	
-	
+
+
 
 	@Override
 	public boolean shouldDestroy ( )

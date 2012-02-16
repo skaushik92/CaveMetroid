@@ -1,10 +1,13 @@
 
 package model.entities.blocks;
 
+import java.util.EnumSet;
+
 import io.ContentManager;
 
 import controller.input.InputChange;
 
+import log.Log;
 import model.GameState;
 import model.graphics.Animation;
 import model.graphics.Sprite;
@@ -15,14 +18,14 @@ import model.time.GameTime;
 public class BackgroundBlock extends Block
 {
 	String	blockType;
-
 	Animation	myAnimation;
 
 
 
-	public BackgroundBlock ( Position position, Object [] params )
+	public BackgroundBlock ( Position position, Object... params )
 	{
 		super ( position );
+		Log.d ( "Program State", "BackgroundBlock Constructor" );
 		blockType = (String) params[ 0 ];
 
 		myAnimation = ContentManager.loadAnimation ( blockType );
@@ -60,5 +63,13 @@ public class BackgroundBlock extends Block
 	public String blockType ( )
 	{
 		return blockType;
+	}
+
+
+
+	@Override
+	public EnumSet < BlockAttributes > getAttributes ( )
+	{
+		return EnumSet.noneOf ( BlockAttributes.class );
 	}
 }

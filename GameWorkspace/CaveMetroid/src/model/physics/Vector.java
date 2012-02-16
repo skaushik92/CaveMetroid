@@ -4,6 +4,8 @@ package model.physics;
 public class Vector
 {
 	public static final Vector	ZERO				= new Vector ( 0, 0 );
+	public static final Vector	X_UNIT			= new Vector ( 1, 0 );
+	public static final Vector	Y_UNIT			= new Vector ( 0, 1 );
 
 	private float				x, y;
 
@@ -54,6 +56,9 @@ public class Vector
 	}
 
 
+	public Vector negate () {
+		return scale ( -1 );
+	}
 
 	public Vector scale ( float factor )
 	{

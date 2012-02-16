@@ -54,4 +54,21 @@ public class BlockCollection implements Iterable < Block >
 	{
 		return blocks;
 	}
+
+
+
+	public boolean containsBlockWithCharacteristic ( BlockAttributes attribute )
+	{
+		for (Block b : blocks)
+			if ( b.getAttributes ( ).contains ( attribute ) )
+				return true;
+		return false;
+	}
+
+
+
+	public void clear ( )
+	{
+		blocks.clear ( );
+	}
 }

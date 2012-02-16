@@ -20,17 +20,18 @@ public class BlockManager
 	// DisappearingBlocks
 	// DestructableBlocks
 
-	BlockCollection [][]	grid;
+	private static BlockCollection [][]	grid;
 
-	int					width;
-	int					height;
-
-	EntityManager			entityManager;
+	private static int					width;
+	private static int					height;
 
 
 
-	public BlockManager ( int width, int height, EntityManager entityManager )
+	public static void initialize ( int gridWidth, int gridHeight )
 	{
+		width = gridWidth;
+		height = gridHeight;
+
 		grid = new BlockCollection [ height ] [ width ];
 
 		for (int row = 0; row < height; row++ )
@@ -41,28 +42,24 @@ public class BlockManager
 				grid[ row ][ col ] = new BlockCollection ( );
 			}
 		}
-
-		this.width = width;
-		this.height = height;
-		this.entityManager = entityManager;
 	}
 
 
 
-	private boolean validCoordinate ( int x, int y )
+	public static boolean validCoordinate ( int col, int row )
 	{
-		return x >= 0 && x < width && y >= 0 && y < height;
+		return col >= 0 && col < width && row >= 0 && row < height;
 	}
 
 
 
-	public void setBlock ( int x, int y, Class < Block > blockType )
+	public static void setBlock ( int col, int row, Class < Block > blockType )
 	{
-		if ( validCoordinate ( x, y ) )
-			grid[ y ][ x ].addBlock ( entityManager.createEntity ( blockType ) );
+		if ( validCoordinate ( col, row ) )
+			grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType ) );
 		else
 		{
-			Log.e ( "Block Setting Error", "Block of type " + blockType.getSimpleName ( ) + " cannot be created at (" + x + ", " + y + ")!" );
+			Log.e ( "Block Setting Error", "Block of type " + blockType.getSimpleName ( ) + " cannot be created at (" + col + ", " + row + ")!" );
 		}
 	}
 
@@ -73,19 +70,33 @@ public class BlockManager
 	 * topRighty are exclusive;
 	 */
 
-	public void setBlocksInRegion ( int bottomLeftx, int bottomLefty, int topRightx, int topRighty, Class < ? extends Block > blockType, Object... blockParameters )
+	public static void setBlocksInRegion ( int bottomLeftCol, int bottomLeftRow, int topRightCol, int topRightRow, Class < ? extends Block > blockType, Object... blockParameters )
 	{
-		if ( validCoordinate ( bottomLeftx, bottomLefty ) && validCoordinate ( topRightx - 1, topRighty - 1 ) )
+		if ( validCoordinate ( bottomLeftCol, bottomLeftRow ) && validCoordinate ( topRightCol - 1, topRightRow - 1 ) )
 		{
-			for (int row = bottomLefty; row < topRighty; row++ )
-				for (int col = bottomLeftx; col < topRightx; col++ )
-					grid[ row ][ col ].addBlock ( entityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
+			for (int row = bottomLeftRow; row < topRightRow; row++ )
+				for (int col = bottomLeftCol; col < topRightCol; col++ )
+					grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
 		}
 	}
 
 
 
-	public List < Block > getViewableBlocks ( Position cameraPos )
+	public static void setBlock ( int col, int row, Class < GroundBlock > blockType, Object... blockParameters )
+	{
+		if ( validCoordinate ( col, row ) )
+		{
+			grid[row][col].clear();
+			if ( blockParameters == null || blockParameters.length == 0 )
+				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ) ) );
+			else
+				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
+		}
+	}
+
+
+
+	public static List < Block > getViewableBlocks ( Position cameraPos )
 	{
 		float posX = cameraPos.getX ( );
 		float upperX = ( posX + view.Constants.WINDOW_WIDTH ) - 1;
@@ -93,8 +104,8 @@ public class BlockManager
 		float posY = cameraPos.getY ( ) - 1;
 		float lowerY = ( posY - view.Constants.WINDOW_HEIGHT );
 
-		Coordinate bottomLeft = coordinateAtWorldPosition ( new Position ( posX, lowerY ) );
-		Coordinate topRight = coordinateAtWorldPosition ( new Position ( upperX, posY ) );
+		BlockCoordinate bottomLeft = coordinateAtWorldPosition ( new Position ( posX, lowerY ) );
+		BlockCoordinate topRight = coordinateAtWorldPosition ( new Position ( upperX, posY ) );
 
 		List < Block > blocksToDraw = new ArrayList < Block > ( );
 
@@ -112,29 +123,21 @@ public class BlockManager
 
 
 
-	public static Coordinate coordinateAtWorldPosition ( Position worldPos )
+	public static BlockCoordinate coordinateAtWorldPosition ( Position worldPos )
 	{
 		int row = 0, col = 0;
 
 		col = ( (int) worldPos.getX ( ) ) / 50;
 		row = ( (int) worldPos.getY ( ) ) / 50;
 
-		return new Coordinate ( row, col );
+		return new BlockCoordinate ( col, row );
 	}
 
 
-	private static final class Coordinate
+
+	public static boolean containsBlockOfTypeAt ( int col, int row, BlockAttributes attribute )
 	{
-		int	row;
-		int	col;
-
-
-
-		public Coordinate ( int row, int column )
-		{
-			this.row = row;
-			this.col = column;
-		}
+		return grid[ row ][ col ].containsBlockWithCharacteristic ( attribute );
 	}
 
 }

@@ -9,10 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import log.Log;
 import model.GameState;
 import model.entities.CollidableEntity;
 import model.entities.EntityAttributes;
 import model.entities.ViewableEntity;
+import model.entities.blocks.BlockAttributes;
+import model.entities.blocks.BlockCoordinate;
+import model.entities.blocks.BlockManager;
 import model.graphics.Animation;
 import model.graphics.Sprite;
 import model.physics.Force;
@@ -36,7 +40,7 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 	 * Physics variables
 	 */
 
-	private static final Force			GRAVITY			= new Force ( 0, -100.0f );
+	private static final Force			GRAVITY			= new Force ( 0, 0.0f );
 
 	protected Position					myPosition;
 	protected Vector					myVelocity;
@@ -111,7 +115,73 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 				 * Checking for collision with ground
 				 * blocks.
 				 */
-				
+
+				BlockManager.coordinateAtWorldPosition ( myPosition );
+
+				/*
+				 * Checking each direction!
+				 */
+
+				// UP
+				if ( myVelocity.getY ( ) > 0 )
+				{
+
+				}
+				// DOWN
+				if ( myVelocity.getY ( ) < 0 )
+				{
+
+				}
+				// RIGHT
+				if ( myVelocity.getX ( ) > 0 )
+				{
+
+				}
+				// LEFT
+				if ( myVelocity.getX ( ) < 0 )
+				{
+					BlockCoordinate currentClosestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ), myPosition.getY ( ) ) );
+					int currCol = currentClosestLeft.getCol ( );
+					int currRow = currentClosestLeft.getRow ();
+					
+					
+					if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow , BlockAttributes.Full_Collidable ) )
+					{
+						Log.d ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+						myVelocity = new Vector ( 0, myVelocity.getY() );
+						myPosition = new Position ( (currCol + 1)* 50 + ( myPosition.getX() - leftMostX () ) , myPosition.getY() );
+					}
+					/*
+					BlockCoordinate currentClosestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ), myPosition.getY ( ) ) );
+					BlockCoordinate currentFarthestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ) + myVelocity.getX ( ), myPosition.getY ( ) ) );
+
+					BlockCoordinate currentClosestTopLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX (), topMostY() ) );
+					BlockCoordinate currentClosestBottomLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX (), bottomMostY() ) );
+					
+					int closestLeftCol = currentClosestLeft.getCol ( );
+					//int farthestLeftCol = currentFarthestLeft.getCol ( );
+					int farthestLeftCol = currentClosestLeft.getCol ( );
+					
+					int closestTopLeftRow = currentClosestTopLeft.getRow ();
+					int closestTopBottomRow = currentClosestTopLeft.getRow ();
+					
+					Log.d ( "Collision Range Check Information", "Current Closest Left: " + closestLeftCol );
+					Log.d ( "Collision Range Check Information", "Current FarthestLeft: " + farthestLeftCol );
+					
+					for ( int currCol = closestLeftCol - 1; currCol >= farthestLeftCol; currCol-- )
+					{
+						for ( int currRow = closestTopBottomRow; currRow <= closestTopLeftRow; currRow++ ) {
+							if ( BlockManager.validCoordinate ( currCol, currRow )) {
+								if ( BlockManager.containsBlockOfTypeAt ( currCol, currRow , BlockAttributes.Full_Collidable ) )
+								{
+									Log.d ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+								}
+							}
+						}
+					}
+					*/
+				}
+
 			}
 		}
 
@@ -122,14 +192,14 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 		currentAnimation.moveForward ( seconds );
 	}
 
-	
-	
 
-	
+
 	public abstract boolean shouldDestroy ( );
+
+
+
 	public abstract EnumSet < EntityAttributes > entityAttributes ( );
 
-	
 
 
 	protected void loadAnimation ( String animationName )
@@ -172,4 +242,32 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 
 	@Override
 	public abstract CollisionShape getCollisionShape ( );
+
+
+
+	public float leftMostX ( )
+	{
+		return myPosition.getX ( ) - getCollisionShape ( ).getWidth ( ) / 2;
+	}
+
+
+
+	public float rightMostX ( )
+	{
+		return myPosition.getX ( ) + getCollisionShape ( ).getWidth ( ) / 2;
+	}
+
+
+
+	public float topMostY ( )
+	{
+		return myPosition.getY ( ) + getCollisionShape ( ).getHeight ( ) / 2;
+	}
+
+
+
+	public float bottomMostY ( )
+	{
+		return myPosition.getY ( ) - getCollisionShape ( ).getHeight ( ) / 2;
+	}
 }

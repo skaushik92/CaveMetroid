@@ -24,11 +24,17 @@ import controller.input.InputChange;
 public class EntityManager
 {
 
-	private Map < Class < ? extends Entity > , Set < ? extends Entity >>	byType;
+	private static Map < Class < ? extends Entity > , Set < ? extends Entity >>	byType;
+
+	static
+	{
+		byType = new HashMap < Class < ? extends Entity > , Set < ? extends Entity > > ( );
+		byType.put ( ViewableEntity.class, new TreeSet < ViewableEntity > ( ViewableEntity.viewableEntityComparator ) );
+	}
 
 
 
-	public void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
+	public static void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
 	{
 		LinkedList < Entity > toRemove = new LinkedList < Entity > ( );
 
@@ -50,7 +56,7 @@ public class EntityManager
 
 
 	@SuppressWarnings ( { "unchecked" } )
-	public < T extends Entity > Set < T > allOfType ( Class < T > classType )
+	public static < T extends Entity > Set < T > allOfType ( Class < T > classType )
 	{
 		Set < T > set = (Set < T >) byType.get ( classType );
 		if ( set == null )
@@ -63,8 +69,31 @@ public class EntityManager
 
 
 
+	public static < T extends Entity > Set < T > allOfTypeExcept ( Class < T > classType, Class < ? extends Entity > exception )
+	{
+		@SuppressWarnings ( "unchecked" )
+		Set < T > set = (Set < T >) byType.get ( classType );
+		if ( set == null )
+		{
+			set = new LinkedHashSet < T > ( );
+			byType.put ( classType, set );
+		}
+
+		Set < T > satisfiesException = new LinkedHashSet < T > ( );
+
+		for (T element : set)
+		{
+			if ( !exception.equals ( element.getClass ( ) ) )
+				satisfiesException.add ( element );
+		}
+
+		return satisfiesException;
+	}
+
+
+
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public < T extends Entity > T createEntity ( Class < T > classType, Object... parameters )
+	public static < T extends Entity > T createEntity ( Class < T > classType, Object... parameters )
 	{
 
 		T entity = null;
@@ -79,6 +108,7 @@ public class EntityManager
 			}
 			catch ( NoSuchMethodException e )
 			{
+				e.printStackTrace ( );
 				Log.e ( "Constructor Finding Error", "Cannot find constructor in " + classType.toString ( ) + " with params " + Arrays.toString ( parameterTypes ) );
 				return null;
 			}
@@ -132,7 +162,7 @@ public class EntityManager
 
 
 	@SuppressWarnings ( { "rawtypes" } )
-	private Class [] typesOf ( Object [] parameters )
+	private static Class [] typesOf ( Object [] parameters )
 	{
 		Class [] types = new Class [ parameters.length ];
 		for (int i = 0; i < parameters.length; i++ )
@@ -143,7 +173,7 @@ public class EntityManager
 
 
 
-	private Set < Class < ? extends Entity > > interfaceDecendenceOf ( Class < ? extends Entity > classType )
+	private static Set < Class < ? extends Entity > > interfaceDecendenceOf ( Class < ? extends Entity > classType )
 	{
 		if ( classType.getInterfaces ( ).length == 0 )
 			return new HashSet < Class < ? extends Entity > > ( );
@@ -164,7 +194,7 @@ public class EntityManager
 
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
-	public < T extends Entity > void destroyEntity ( T entity )
+	public static < T extends Entity > void destroyEntity ( T entity )
 	{
 		for (Class c = entity.getClass ( ); c != Object.class; c = c.getSuperclass ( ))
 		{
@@ -174,15 +204,7 @@ public class EntityManager
 
 
 
-	public EntityManager ( )
-	{
-		byType = new HashMap < Class < ? extends Entity > , Set < ? extends Entity > > ( );
-		byType.put ( ViewableEntity.class, new TreeSet < ViewableEntity > ( ViewableEntity.viewableEntityComparator ) );
-	}
-
-
-
-	public < T extends Entity > T getSingleton ( Class < T > type )
+	public static < T extends Entity > T getSingleton ( Class < T > type )
 	{
 		List < T > typeObjs = new ArrayList < T > ( allOfType ( type ) );
 

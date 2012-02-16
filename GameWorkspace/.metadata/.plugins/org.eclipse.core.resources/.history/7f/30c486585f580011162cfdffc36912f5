@@ -1,0 +1,13 @@
+public class BlockCoordinate
+{
+	int	row;
+	int	col;
+
+
+
+	public Coordinate ( int row, int column )
+	{
+		this.row = row;
+		this.col = column;
+	}
+}
