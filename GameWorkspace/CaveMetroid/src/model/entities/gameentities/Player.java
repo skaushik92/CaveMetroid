@@ -9,40 +9,42 @@ import controller.input.InputChange;
 import controller.input.keyboard.Key;
 import controller.input.keyboard.KeyState;
 import log.Log;
+import model.Action;
+import model.Constants;
 import model.GameState;
 import model.entities.EntityAttributes;
 import model.graphics.Sprite;
+import model.managers.ButtonManager;
 import model.physics.Position;
 import model.physics.Vector;
 import model.physics.collision.CollisionShape;
 import model.time.GameTime;
 import model.time.TimeInstant;
-import view.Constants;
 
 
 public class Player extends AbstractGameEntity
 {
 	/**
-	 * All classes will have the same version so as to keep
-	 * consistency within all classes.
+	 * All classes will have the same version so as to keep consistency within all classes.
 	 */
-	
-	private static final CollisionShape PLAYER_COLLISION_SHAPE = new CollisionShape ( new Rectangle ( new Dimension ( 30 , 50 ) ) );
-	
-	private static final long	serialVersionUID	= Constants.serialVersionUID;
 
-	private static final float	DEFAULT_SPEED		= 100.0f;
+	private static final CollisionShape	PLAYER_COLLISION_SHAPE	= new CollisionShape ( new Rectangle ( new Dimension ( 30, 48 ) ) );
 
-	private static final float	CHARGE_DURATION	= 1.0f;
-	private static final float	JUMP_TIME			= 1.0f;
+	private static final long			serialVersionUID		= Constants.serialVersionUID;
 
-	private boolean			charging;
-	private boolean			movingRight;
-	private boolean			jumping;
+	private static final float			DEFAULT_SPEED			= 100.0f;
 
-	private TimeInstant			chargeStartTime;
+	private static final float			CHARGE_DURATION		= 1.0f;
+	private static final float			JUMP_TIME				= 0.5f;
+	private static final float			JUMP_CONSTANT			= 500;
 
-	private TimeInstant			jumpStartTime;
+	private boolean					charging;
+	private boolean					movingRight;
+	private boolean					jumping;
+
+	private TimeInstant					chargeStartTime;
+
+	private TimeInstant					jumpStartTime;
 
 
 
@@ -74,7 +76,7 @@ public class Player extends AbstractGameEntity
 		 * Initalizing player characteristics.
 		 */
 
-		myPosition = new Position ( 700, 25 );
+		myPosition = new Position ( 200, 600 + Constants.BLOCK_HEIGHT / 2 );
 
 	}
 
@@ -90,11 +92,10 @@ public class Player extends AbstractGameEntity
 
 		float elapsedSeconds = gameTime.getElapsedTime ( ).getSeconds ( );
 		/*
-		 * Handles player state given user input through
-		 * character keys
+		 * Handles player state given user input through character keys
 		 */
 
-		if ( !charging && inputChange.justPressed ( Key.C ) )
+		if ( !charging && inputChange.justPressed ( ButtonManager.get ( Action.Charge ) ) )
 		{
 			charging = true;
 			chargeStartTime = gameTime.getCurrentTime ( );
@@ -113,20 +114,19 @@ public class Player extends AbstractGameEntity
 		}
 
 		/*
-		 * Handles player's left and right movement given user
-		 * input through arrow keys
+		 * Handles player's left and right movement given user input through arrow keys
 		 */
 
-		if ( !currentKeyState.anyPressed ( Key.LEFT, Key.RIGHT ) || currentKeyState.allPressed ( Key.LEFT, Key.RIGHT ) )
+		if ( !currentKeyState.anyPressed ( ButtonManager.get ( Action.MoveLeft ), ButtonManager.get ( Action.MoveRight ) ) || currentKeyState.allPressed ( ButtonManager.get ( Action.MoveLeft ), ButtonManager.get ( Action.MoveRight ) ) )
 		{
 			charging = false;
 			boolean hadFlipped = currentAnimation.getFlip ( );
 			setAnimation ( "idle" );
 			currentAnimation.setFlip ( hadFlipped );
 
-			myVelocity = new Vector ( 0, myVelocity.getY ( ) );
+			myVelocity.setX ( 0 );
 		}
-		else if ( inputChange.justPressed ( Key.RIGHT ) || ( inputChange.justReleased ( Key.LEFT ) && currentKeyState.isDown ( Key.RIGHT ) ) )
+		else if ( inputChange.justPressed ( ButtonManager.get ( Action.MoveRight ) ) || ( inputChange.justReleased ( ButtonManager.get ( Action.MoveLeft ) ) && currentKeyState.isDown ( ButtonManager.get ( Action.MoveRight ) ) ) )
 		{
 			setAnimation ( "run" );
 			movingRight = true;
@@ -134,7 +134,7 @@ public class Player extends AbstractGameEntity
 
 			updatePlayerVelocity ( );
 		}
-		else if ( inputChange.justPressed ( Key.LEFT ) || ( inputChange.justReleased ( Key.RIGHT ) && currentKeyState.isDown ( Key.LEFT ) ) )
+		else if ( inputChange.justPressed ( ButtonManager.get ( Action.MoveLeft ) ) || ( inputChange.justReleased ( ButtonManager.get ( Action.MoveRight ) ) && currentKeyState.isDown ( ButtonManager.get ( Action.MoveLeft ) ) ) )
 		{
 			setAnimation ( "run" );
 			movingRight = false;
@@ -146,10 +146,12 @@ public class Player extends AbstractGameEntity
 		 * Handles player's jumping capabilities
 		 */
 
-		if ( !jumping && inputChange.justPressed ( Key.UP ) )
+		if ( !jumping && inputChange.justPressed ( ButtonManager.get ( Action.Jump ) ) )
 		{
 			jumping = true;
 			jumpStartTime = gameTime.getCurrentTime ( );
+
+			myVelocity.setY ( myVelocity.getY ( ) + JUMP_CONSTANT );
 		}
 
 		if ( jumping )
@@ -170,7 +172,7 @@ public class Player extends AbstractGameEntity
 
 	private void updatePlayerVelocity ( )
 	{
-		myVelocity = new Vector ( dirSign ( ) * getCurrentMovementMagnitude ( ), myVelocity.getY ( ) );
+		myVelocity.setX ( dirSign ( ) * getCurrentMovementMagnitude ( ) );
 	}
 
 
@@ -199,7 +201,6 @@ public class Player extends AbstractGameEntity
 	@Override
 	public boolean shouldDestroy ( )
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -208,7 +209,6 @@ public class Player extends AbstractGameEntity
 	@Override
 	public Position getPosition ( )
 	{
-		// TODO Auto-generated method stub
 		return myPosition;
 	}
 
@@ -218,7 +218,6 @@ public class Player extends AbstractGameEntity
 	public Sprite getSprite ( )
 	{
 		Log.v ( "Program State", "Player.getSprite" );
-		// TODO Auto-generated method stub
 		return currentAnimation.getCurrentSprite ( );
 	}
 
@@ -227,7 +226,7 @@ public class Player extends AbstractGameEntity
 	@Override
 	public EnumSet < EntityAttributes > entityAttributes ( )
 	{
-		return EnumSet.of ( EntityAttributes.Physical , EntityAttributes.Ground_Collidable);
+		return EnumSet.of ( EntityAttributes.Physical, EntityAttributes.Ground_Collidable );
 	}
 
 

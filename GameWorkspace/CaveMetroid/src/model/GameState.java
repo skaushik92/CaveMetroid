@@ -32,6 +32,7 @@ public class GameState
 	LevelManager				lvlManager;
 
 
+
 	public GameState ( )
 	{
 		Log.v ( "Program State", "GameState.Constructor(1)" );

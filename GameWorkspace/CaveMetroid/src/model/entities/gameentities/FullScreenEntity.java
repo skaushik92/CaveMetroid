@@ -8,8 +8,10 @@ import view.Constants;
 import view.GameWindow;
 
 import log.Log;
+import model.Action;
 import model.GameState;
 import model.entities.Entity;
+import model.managers.ButtonManager;
 import model.time.GameTime;
 import controller.input.InputChange;
 import controller.input.keyboard.Key;
@@ -51,7 +53,7 @@ public class FullScreenEntity implements Entity
 			switchScreen ( );
 			applySwitch = false;
 		}
-		if ( inputChange.justPressed ( Key.F11 ) )
+		if ( inputChange.justPressed ( ButtonManager.get ( Action.FullScreen ) ) )
 		{
 			applySwitch = true;
 			gameState.getCamera ( ).addCameraYPosition ( ( isFullScreen ? -1 : 1 ) * ( fullScreenWindowHeight - windowedWindowHeight ) );

@@ -1,9 +1,11 @@
+
 package model.entities.blocks;
 
 public class BlockCoordinate
 {
 	int	row;
 	int	col;
+
 
 
 	public BlockCoordinate ( int column, int row )
@@ -13,18 +15,23 @@ public class BlockCoordinate
 	}
 
 
+
 	public int getCol ( )
 	{
 		return col;
 	}
 
 
+
 	public int getRow ( )
 	{
 		return row;
 	}
-	
-	public String toString() {
+
+
+
+	public String toString ( )
+	{
 		return "BlockCoordinate: (" + col + ", " + row + ")";
 	}
 }

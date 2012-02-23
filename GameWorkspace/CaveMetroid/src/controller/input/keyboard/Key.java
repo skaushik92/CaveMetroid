@@ -13,7 +13,7 @@ public enum Key
 	W ( KeyEvent.VK_W ), A ( KeyEvent.VK_A ), S ( KeyEvent.VK_S ), D ( KeyEvent.VK_D ),
 
 	// Function Keys
-	F11 ( KeyEvent.VK_F11 ), C ( KeyEvent.VK_C );
+	F11 ( KeyEvent.VK_F11 ), C ( KeyEvent.VK_C ), Z ( KeyEvent.VK_Z ), ESC ( KeyEvent.VK_ESCAPE ), Q ( KeyEvent.VK_Q ), NONE ( KeyEvent.CHAR_UNDEFINED );
 
 	public final int	keyCode;
 

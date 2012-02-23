@@ -67,15 +67,16 @@ public class GameModel implements Runnable
 		Player player = EntityManager.createEntity ( Player.class );
 		FullScreenEntity fullScreen = EntityManager.createEntity ( FullScreenEntity.class );
 		CameraEntity camera = EntityManager.createEntity ( CameraEntity.class, new Position ( 0, Constants.WINDOW_HEIGHT ) );
-		
+
 		BlockManager.setBlocksInRegion ( 0, 0, numBlockCols, numBlockRows, GroundBlock.class, "castle-ground" );
-		//BlockManager.setBlock ( 10, 0, GroundBlock.class, "castle-ground");
-		
+		// BlockManager.setBlock ( 10, 0, GroundBlock.class,
+		// "castle-ground");
+
 		Entity [] entities = new Entity [ ] { longBox, rectBox, player, fullScreen, camera };
-		
+
 		for (Entity e : entities)
 			Log.v ( "Initial Entity Information", e.getClass ( ).getName ( ) );
-		
+
 		return newState;
 	}
 

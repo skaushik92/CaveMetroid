@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import log.Log;
+import model.Constants;
 import model.GameState;
 import model.entities.CollidableEntity;
 import model.entities.EntityAttributes;
@@ -28,9 +29,7 @@ import controller.input.InputChange;
 
 
 /**
- * All game entities have the following characteristics: - Have
- * an Animation (but can be just one frame) - Have a Position
- * (but can be unchanging) -
+ * All game entities have the following characteristics: - Have an Animation (but can be just one frame) - Have a Position (but can be unchanging) -
  */
 
 public abstract class AbstractGameEntity implements ViewableEntity, CollidableEntity
@@ -40,7 +39,7 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 	 * Physics variables
 	 */
 
-	private static final Force			GRAVITY			= new Force ( 0, 0.0f );
+	private static final Force			GRAVITY			= new Force ( 0, -1000.0f );
 
 	protected Position					myPosition;
 	protected Vector					myVelocity;
@@ -99,8 +98,6 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 
 		if ( attrs.contains ( EntityAttributes.Physical ) )
 		{
-			myPosition = myPosition.plus ( myVelocity.scale ( seconds ) );
-			myVelocity = myVelocity.plus ( myAcceleration.scale ( seconds ) );
 
 			for (Force f : appliedForces)
 				f.update ( gameTime, inputChange, gameState );
@@ -112,8 +109,7 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 			if ( attrs.contains ( ( EntityAttributes.Ground_Collidable ) ) )
 			{
 				/*
-				 * Checking for collision with ground
-				 * blocks.
+				 * Checking for collision with ground blocks.
 				 */
 
 				BlockManager.coordinateAtWorldPosition ( myPosition );
@@ -130,7 +126,41 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 				// DOWN
 				if ( myVelocity.getY ( ) < 0 )
 				{
+					Position leftBottom = new Position ( leftMostX ( ), bottomMostY ( ) + myVelocity.scale ( seconds ).getY ( ) );
+					Position rightBottom = new Position ( rightMostX ( ), bottomMostY ( ) + myVelocity.scale ( seconds ).getY ( ) );
 
+					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
+					BlockCoordinate currentClosestRightLowerboundY = BlockManager.coordinateAtWorldPosition ( rightBottom );
+
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getCol ( ) <= currentClosestRightLowerboundY.getCol ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ) + 1, bCoord.getRow ( ) ))
+					{
+
+						int currCol = bCoord.getCol ( );
+						int currRow = bCoord.getRow ( );
+
+						if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) )
+						{
+							Log.v ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+
+							myVelocity.setY ( 0 );
+
+							/*
+							 * To compute the correct X component of the player's position, we do the following:
+							 * 
+							 * 1. Find the x coordinate of the first open pixel to the right of the collided object.
+							 * 
+							 * 2. Find the how much we should shift our entity to make the entity's left edge just touch the collided object.
+							 * 
+							 * step 1 is done by: ( currCol + 1 ) * 50
+							 * 
+							 * step 2 is done by: myPosition.getX() - leftMostX()
+							 */
+
+							float newY = ( currRow + 1 ) * Constants.BLOCK_HEIGHT + ( myPosition.getY ( ) - bottomMostY ( ) );
+
+							myPosition.setY ( newY );
+						}
+					}
 				}
 				// RIGHT
 				if ( myVelocity.getX ( ) > 0 )
@@ -140,49 +170,45 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 				// LEFT
 				if ( myVelocity.getX ( ) < 0 )
 				{
-					BlockCoordinate currentClosestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ), myPosition.getY ( ) ) );
-					int currCol = currentClosestLeft.getCol ( );
-					int currRow = currentClosestLeft.getRow ();
-					
-					
-					if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow , BlockAttributes.Full_Collidable ) )
-					{
-						Log.d ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
-						myVelocity = new Vector ( 0, myVelocity.getY() );
-						myPosition = new Position ( (currCol + 1)* 50 + ( myPosition.getX() - leftMostX () ) , myPosition.getY() );
-					}
-					/*
-					BlockCoordinate currentClosestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ), myPosition.getY ( ) ) );
-					BlockCoordinate currentFarthestLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX ( ) + myVelocity.getX ( ), myPosition.getY ( ) ) );
+					Position leftTop = new Position ( leftMostX ( ) + myVelocity.scale ( seconds ).getX ( ), topMostY ( ) );
+					Position leftBottom = new Position ( leftMostX ( ) + myVelocity.scale ( seconds ).getX ( ), bottomMostY ( ) );
 
-					BlockCoordinate currentClosestTopLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX (), topMostY() ) );
-					BlockCoordinate currentClosestBottomLeft = BlockManager.coordinateAtWorldPosition ( new Position ( leftMostX (), bottomMostY() ) );
-					
-					int closestLeftCol = currentClosestLeft.getCol ( );
-					//int farthestLeftCol = currentFarthestLeft.getCol ( );
-					int farthestLeftCol = currentClosestLeft.getCol ( );
-					
-					int closestTopLeftRow = currentClosestTopLeft.getRow ();
-					int closestTopBottomRow = currentClosestTopLeft.getRow ();
-					
-					Log.d ( "Collision Range Check Information", "Current Closest Left: " + closestLeftCol );
-					Log.d ( "Collision Range Check Information", "Current FarthestLeft: " + farthestLeftCol );
-					
-					for ( int currCol = closestLeftCol - 1; currCol >= farthestLeftCol; currCol-- )
+					BlockCoordinate currentClosestLeftUpperboundY = BlockManager.coordinateAtWorldPosition ( leftTop );
+					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
+
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getRow ( ) <= currentClosestLeftUpperboundY.getRow ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ), bCoord.getRow ( ) + 1 ))
 					{
-						for ( int currRow = closestTopBottomRow; currRow <= closestTopLeftRow; currRow++ ) {
-							if ( BlockManager.validCoordinate ( currCol, currRow )) {
-								if ( BlockManager.containsBlockOfTypeAt ( currCol, currRow , BlockAttributes.Full_Collidable ) )
-								{
-									Log.d ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
-								}
-							}
+
+						int currCol = bCoord.getCol ( );
+						int currRow = bCoord.getRow ( );
+
+						if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) )
+						{
+							Log.v ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+
+							myVelocity.setX ( 0 );
+							/*
+							 * To compute the correct X component of the player's position, we do the following:
+							 * 
+							 * 1. Find the x coordinate of the first open pixel to the right of the collided object.
+							 * 
+							 * 2. Find the how much we should shift our entity to make the entity's left edge just touch the collided object.
+							 * 
+							 * step 1 is done by: ( currCol + 1 ) * 50
+							 * 
+							 * step 2 is done by: myPosition.getX() - leftMostX()
+							 */
+
+							float newX = ( currCol + 1 ) * Constants.BLOCK_WIDTH + ( myPosition.getX ( ) - leftMostX ( ) );
+
+							myPosition.setX ( newX );
 						}
 					}
-					*/
 				}
-
 			}
+
+			myPosition = myPosition.plus ( myVelocity.scale ( seconds ) );
+			myVelocity = myVelocity.plus ( myAcceleration.scale ( seconds ) );
 		}
 
 		/*

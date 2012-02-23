@@ -1,9 +1,0 @@
-2012/02/15 23:47:43 	:	 main             	:	 Program State                  (D) 	:	 GameModel.Constructor
-2012/02/15 23:47:45 	:	 main             	:	 Program State                  (D) 	:	 Player.Constructor
-2012/02/15 23:47:45 	:	 Model Thread     	:	 Program State                  (D) 	:	 GameModel.run
-2012/02/15 23:47:45 	:	 Controller Thread 	:	 Program State                  (D) 	:	 GameController.run
-2012/02/15 23:47:48 	:	 Model Thread     	:	 Collision Information          (D) 	:	 Collided with a block at (9, 0)
-2012/02/15 23:47:48 	:	 Model Thread     	:	 Collision Information          (D) 	:	 Collided with a block at (9, 0)
-2012/02/15 23:47:49 	:	 Model Thread     	:	 Collision Information          (D) 	:	 Collided with a block at (9, 0)
-2012/02/15 23:47:53 	:	 Model Thread     	:	 Collision Information          (D) 	:	 Collided with a block at (9, 0)
-2012/02/15 23:47:54 	:	 Model Thread     	:	 Collision Information          (D) 	:	 Collided with a block at (9, 0)

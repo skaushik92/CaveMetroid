@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import log.Log;
+import model.Constants;
 import model.managers.EntityManager;
 import model.physics.Position;
 
@@ -76,7 +77,7 @@ public class BlockManager
 		{
 			for (int row = bottomLeftRow; row < topRightRow; row++ )
 				for (int col = bottomLeftCol; col < topRightCol; col++ )
-					grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
+					grid[ row ][ col ].addBlock ( EntityManager.createEntity ( blockType, new Position ( Constants.BLOCK_WIDTH * col +  Constants.BLOCK_WIDTH / 2, Constants.BLOCK_HEIGHT * row + Constants.BLOCK_HEIGHT / 2 ), blockParameters ) );
 		}
 	}
 
@@ -88,9 +89,9 @@ public class BlockManager
 		{
 			grid[row][col].clear();
 			if ( blockParameters == null || blockParameters.length == 0 )
-				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ) ) );
+				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( Constants.BLOCK_WIDTH * col + Constants.BLOCK_WIDTH / 2, Constants.BLOCK_HEIGHT * row + Constants.BLOCK_HEIGHT / 2 ) ) );
 			else
-				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( 50 * col + 25, 50 * row + 25 ), blockParameters ) );
+				grid[row][col].addBlock ( EntityManager.createEntity ( blockType, new Position ( Constants.BLOCK_WIDTH * col + Constants.BLOCK_WIDTH / 2, Constants.BLOCK_HEIGHT * row + Constants.BLOCK_HEIGHT / 2 ), blockParameters ) );
 		}
 	}
 
@@ -127,8 +128,8 @@ public class BlockManager
 	{
 		int row = 0, col = 0;
 
-		col = ( (int) worldPos.getX ( ) ) / 50;
-		row = ( (int) worldPos.getY ( ) ) / 50;
+		col = ( (int) worldPos.getX ( ) ) / Constants.BLOCK_WIDTH;
+		row = ( (int) worldPos.getY ( ) ) / Constants.BLOCK_HEIGHT;
 
 		return new BlockCoordinate ( col, row );
 	}

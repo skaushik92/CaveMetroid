@@ -56,9 +56,13 @@ public class Vector
 	}
 
 
-	public Vector negate () {
+
+	public Vector negate ( )
+	{
 		return scale ( -1 );
 	}
+
+
 
 	public Vector scale ( float factor )
 	{
@@ -78,14 +82,11 @@ public class Vector
 	 * Performs linear interpolation between two vectors.
 	 * 
 	 * @param v1
-	 *             First vector. If percent == 0, this vector
-	 *             is returned.
+	 *             First vector. If percent == 0, this vector is returned.
 	 * @param v2
-	 *             Second vector. If percent == 1, this vector
-	 *             is returned.
+	 *             Second vector. If percent == 1, this vector is returned.
 	 * @param percent
-	 *             The percentage by which the new vector
-	 *             should resemble v2 from v1.
+	 *             The percentage by which the new vector should resemble v2 from v1.
 	 * @return The linearly interpolated vector.
 	 */
 
@@ -112,6 +113,35 @@ public class Vector
 	public float getY ( )
 	{
 		return y;
+	}
+
+
+
+	public void setX ( float newX )
+	{
+		x = newX;
+	}
+
+
+
+	public void setY ( float newY )
+	{
+		y = newY;
+	}
+
+
+
+	public void set ( float newX, float newY )
+	{
+		setX ( newX );
+		setY ( newY );
+	}
+
+
+
+	public void setVector ( Vector v )
+	{
+		set ( v.getX ( ), v.getY ( ) );
 	}
 
 

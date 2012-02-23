@@ -14,8 +14,7 @@ import log.Constants;
 public class Log
 {
 	/**
-	 * All classes will have the same version so as to keep
-	 * consistency within all classes.
+	 * All classes will have the same version so as to keep consistency within all classes.
 	 */
 
 	private static final long	serialVersionUID	= Constants.serialVersionUID;
@@ -28,16 +27,17 @@ public class Log
 
 	private static final int		CURRENT_LEVEL		= D;
 
+	private static final boolean	WRITE_OUT			= false;
+
+
+
 	/**
-	 * Use this method to log messages that are considered to
-	 * show verbose information.
+	 * Use this method to log messages that are considered to show verbose information.
 	 * 
 	 * @param tag
-	 *             A label attached to the message for the
-	 *             purpose of classifying information
+	 *             A label attached to the message for the purpose of classifying information
 	 * @param message
-	 *             Information to be shown along with the
-	 *             message
+	 *             Information to be shown along with the message
 	 */
 
 	public static void v ( String tag, Object message )
@@ -48,15 +48,12 @@ public class Log
 
 
 	/**
-	 * Use this method to log messages that are considered to
-	 * show debug information.
+	 * Use this method to log messages that are considered to show debug information.
 	 * 
 	 * @param tag
-	 *             A label attached to the message for the
-	 *             purpose of classifying information
+	 *             A label attached to the message for the purpose of classifying information
 	 * @param message
-	 *             Information to be shown along with the
-	 *             message
+	 *             Information to be shown along with the message
 	 */
 
 	public static void d ( String tag, Object message )
@@ -67,15 +64,12 @@ public class Log
 
 
 	/**
-	 * Use this method to log messages that are considered to
-	 * show important information.
+	 * Use this method to log messages that are considered to show important information.
 	 * 
 	 * @param tag
-	 *             A label attached to the message for the
-	 *             purpose of classifying information
+	 *             A label attached to the message for the purpose of classifying information
 	 * @param message
-	 *             Information to be shown along with the
-	 *             message
+	 *             Information to be shown along with the message
 	 */
 
 	public static void i ( String tag, Object message )
@@ -86,15 +80,12 @@ public class Log
 
 
 	/**
-	 * Use this method to log messages that are considered to
-	 * show error information.
+	 * Use this method to log messages that are considered to show error information.
 	 * 
 	 * @param tag
-	 *             A label attached to the message for the
-	 *             purpose of classifying information
+	 *             A label attached to the message for the purpose of classifying information
 	 * @param message
-	 *             Information to be shown along with the
-	 *             message
+	 *             Information to be shown along with the message
 	 */
 
 	public static void e ( String tag, Object message )
@@ -105,15 +96,12 @@ public class Log
 
 
 	/**
-	 * Use this method to log messages that are considered to
-	 * show What a Terrible Failure has happened.
+	 * Use this method to log messages that are considered to show What a Terrible Failure has happened.
 	 * 
 	 * @param tag
-	 *             A label attached to the message for the
-	 *             purpose of classifying information
+	 *             A label attached to the message for the purpose of classifying information
 	 * @param message
-	 *             Information to be shown along with the
-	 *             message
+	 *             Information to be shown along with the message
 	 */
 
 	public static void wtf ( String tag, Object message )
@@ -124,12 +112,10 @@ public class Log
 
 
 	/**
-	 * Logs the given information if the importance level is
-	 * greater than the current level.
+	 * Logs the given information if the importance level is greater than the current level.
 	 * 
 	 * @param importanceLevel
-	 *             The level of importance this information is
-	 *             given
+	 *             The level of importance this information is given
 	 * @param tag
 	 *             The tag for the given information
 	 * @param message
@@ -145,13 +131,10 @@ public class Log
 
 
 	/**
-	 * Outputs the full information given, along with
-	 * prepending the current time information, and appending a
-	 * new line, to the console and to file.
+	 * Outputs the full information given, along with prepending the current time information, and appending a new line, to the console and to file.
 	 * 
 	 * @param importanceLevel
-	 *             The level of importance this information is
-	 *             given
+	 *             The level of importance this information is given
 	 * @param tag
 	 *             The tag for the given information
 	 * @param message
@@ -184,28 +167,29 @@ public class Log
 
 	private static synchronized void writeOut ( String text )
 	{
-		try
+		if ( WRITE_OUT )
 		{
-			FileWriter fstream = new FileWriter ( Constants.LOG_FILE_NAME, true );
-			BufferedWriter out = new BufferedWriter ( fstream );
-			out.write ( text );
-			out.close ( );
-		}
-		catch ( Exception e )
-		{
-			System.err.println ( "Error writing line: " + text );
-			e.printStackTrace ( );
+			try
+			{
+				FileWriter fstream = new FileWriter ( Constants.LOG_FILE_NAME, true );
+				BufferedWriter out = new BufferedWriter ( fstream );
+				out.write ( text );
+				out.close ( );
+			}
+			catch ( Exception e )
+			{
+				System.err.println ( "Error writing line: " + text );
+				e.printStackTrace ( );
+			}
 		}
 	}
 
 
 
 	/**
-	 * Finds the current time and returns the string object
-	 * representing it.
+	 * Finds the current time and returns the string object representing it.
 	 * 
-	 * @return The current time as a String with the format
-	 *         given by Constants.DATE_FORMAT
+	 * @return The current time as a String with the format given by Constants.DATE_FORMAT
 	 */
 
 	private static String currentTime ( )
@@ -218,15 +202,12 @@ public class Log
 
 
 	/**
-	 * Formats the output of the message in the following
-	 * manner:
+	 * Formats the output of the message in the following manner:
 	 * 
-	 * [TAG] ([LEVEL]) {TAB CHARACTER}:{TAB CHARACTER}
-	 * [MESSAGE]
+	 * [TAG] ([LEVEL]) {TAB CHARACTER}:{TAB CHARACTER} [MESSAGE]
 	 * 
 	 * @param importanceLevel
-	 *             The level of importance this information is
-	 *             given
+	 *             The level of importance this information is given
 	 * @param tag
 	 *             The tag for the given information
 	 * @param message
@@ -242,13 +223,11 @@ public class Log
 
 
 	/**
-	 * Formats the tag by making sure all tags contain the same
-	 * number of characters.
+	 * Formats the tag by making sure all tags contain the same number of characters.
 	 * 
 	 * @param tag
 	 *             The Original string representing the tag
-	 * @return The formatted String object with the length
-	 *         given by Constants.TAG_LENGTH
+	 * @return The formatted String object with the length given by Constants.TAG_LENGTH
 	 */
 
 	private static String formatTag ( String tag )
@@ -264,14 +243,11 @@ public class Log
 
 
 	/**
-	 * Formats the thread name in the log by making sure all
-	 * thread names are of the same length.
+	 * Formats the thread name in the log by making sure all thread names are of the same length.
 	 * 
 	 * @param threadName
-	 *             The original String object representing the
-	 *             thread name
-	 * @return The formatted String object with the length
-	 *         given by Constants.THREAD_LENGTH
+	 *             The original String object representing the thread name
+	 * @return The formatted String object with the length given by Constants.THREAD_LENGTH
 	 */
 
 	private static String formatThreadName ( String threadName )
@@ -287,13 +263,10 @@ public class Log
 
 
 	/**
-	 * Converts the integer representation of the level of
-	 * importance to the String representation of the level of
-	 * importance.
+	 * Converts the integer representation of the level of importance to the String representation of the level of importance.
 	 * 
 	 * @param l
-	 *             The integer representing the importance
-	 *             level
+	 *             The integer representing the importance level
 	 * @return The string representing the importance level
 	 */
 
@@ -305,8 +278,7 @@ public class Log
 
 
 	/**
-	 * Initializes the logger by resetting the text in the log
-	 * file.
+	 * Initializes the logger by resetting the text in the log file.
 	 */
 
 	public static void init ( )
