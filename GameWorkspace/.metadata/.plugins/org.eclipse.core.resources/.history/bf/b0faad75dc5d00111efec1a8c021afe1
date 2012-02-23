@@ -1,0 +1,43 @@
+
+package model.managers;
+
+import java.util.HashMap;
+
+import controller.input.keyboard.Key;
+
+
+public class ButtonManager
+{
+	public enum Action
+	{
+		Jump, MoveLeft, MoveRight, Inspect, LookUp, LookDown, LocalMap, WorldMap, WeaponSelectLeft, WeaponSelectRight, Charge, Exit, Pause, FullScreen
+	}
+
+
+	public static HashMap < Action , Key >	actionToButtonMap;
+
+	static
+	{
+		actionToButtonMap = new HashMap < Action , Key > ( );
+		
+		actionToButtonMap.put ( Action.MoveLeft, Key.LEFT );
+		actionToButtonMap.put ( Action.MoveRight, Key.RIGHT );
+		actionToButtonMap.put ( Action.Inspect, Key.DOWN );
+		actionToButtonMap.put ( Action.LookDown, Key.DOWN );
+		actionToButtonMap.put ( Action.Jump, Key.Z );
+		actionToButtonMap.put ( Action.LocalMap, Key.Q );
+		actionToButtonMap.put ( Action.WorldMap, Key.W );
+		actionToButtonMap.put ( Action.WeaponSelectLeft, Key.A );
+		actionToButtonMap.put ( Action.WeaponSelectRight, Key.S );
+		actionToButtonMap.put ( Action.Charge, Key.C );
+		actionToButtonMap.put ( Action.Exit, Key.ESC );
+		actionToButtonMap.put ( Action.FullScreen, Key.F11 );
+	}
+
+
+
+	public static void map ( Key k, Action a )
+	{
+		actionToButtonMap.put ( a, k );
+	}
+}

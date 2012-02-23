@@ -1,0 +1,298 @@
+
+package log;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+
+import log.Constants;
+
+
+public class Log
+{
+	/**
+	 * All classes will have the same version so as to keep consistency within all classes.
+	 */
+
+	private static final long	serialVersionUID	= Constants.serialVersionUID;
+
+	private static final int		V				= 0;
+	private static final int		D				= 1;
+	private static final int		I				= 2;
+	private static final int		E				= 3;
+	private static final int		WTF				= Integer.MAX_VALUE;
+
+	private static final int		CURRENT_LEVEL		= D;
+
+	private static final boolean	WRITE_OUT	= false;
+
+
+
+	/**
+	 * Use this method to log messages that are considered to show verbose information.
+	 * 
+	 * @param tag
+	 *             A label attached to the message for the purpose of classifying information
+	 * @param message
+	 *             Information to be shown along with the message
+	 */
+
+	public static void v ( String tag, Object message )
+	{
+		log ( V, tag, message );
+	}
+
+
+
+	/**
+	 * Use this method to log messages that are considered to show debug information.
+	 * 
+	 * @param tag
+	 *             A label attached to the message for the purpose of classifying information
+	 * @param message
+	 *             Information to be shown along with the message
+	 */
+
+	public static void d ( String tag, Object message )
+	{
+		log ( D, tag, message );
+	}
+
+
+
+	/**
+	 * Use this method to log messages that are considered to show important information.
+	 * 
+	 * @param tag
+	 *             A label attached to the message for the purpose of classifying information
+	 * @param message
+	 *             Information to be shown along with the message
+	 */
+
+	public static void i ( String tag, Object message )
+	{
+		log ( I, tag, message );
+	}
+
+
+
+	/**
+	 * Use this method to log messages that are considered to show error information.
+	 * 
+	 * @param tag
+	 *             A label attached to the message for the purpose of classifying information
+	 * @param message
+	 *             Information to be shown along with the message
+	 */
+
+	public static void e ( String tag, Object message )
+	{
+		log ( E, tag, message );
+	}
+
+
+
+	/**
+	 * Use this method to log messages that are considered to show What a Terrible Failure has happened.
+	 * 
+	 * @param tag
+	 *             A label attached to the message for the purpose of classifying information
+	 * @param message
+	 *             Information to be shown along with the message
+	 */
+
+	public static void wtf ( String tag, Object message )
+	{
+		log ( WTF, tag, message );
+	}
+
+
+
+	/**
+	 * Logs the given information if the importance level is greater than the current level.
+	 * 
+	 * @param importanceLevel
+	 *             The level of importance this information is given
+	 * @param tag
+	 *             The tag for the given information
+	 * @param message
+	 *             The main information to be logged
+	 */
+
+	private static void log ( int importanceLevel, String tag, Object message )
+	{
+		if ( importanceLevel >= CURRENT_LEVEL )
+			output ( importanceLevel, tag, message );
+	}
+
+
+
+	/**
+	 * Outputs the full information given, along with prepending the current time information, and appending a new line, to the console and to file.
+	 * 
+	 * @param importanceLevel
+	 *             The level of importance this information is given
+	 * @param tag
+	 *             The tag for the given information
+	 * @param message
+	 *             The main information to be logged
+	 */
+
+	private static void output ( int importanceLevel, String tag, Object message )
+	{
+		String currentTime = currentTime ( );
+
+		String currentThreadName = Thread.currentThread ( ).getName ( );
+
+		String formattedOutput = formatOutput ( importanceLevel, tag, message );
+
+		String finalOutput = currentTime + " \t:\t " + formatThreadName ( currentThreadName ) + " \t:\t " + formattedOutput + "\n";
+
+		( importanceLevel < E ? System.out : System.err ).print ( finalOutput );
+
+		writeOut ( finalOutput );
+	}
+
+
+
+	/**
+	 * Writes out the line into the log file.
+	 * 
+	 * @param text
+	 *             The line to be logged
+	 */
+
+	private static synchronized void writeOut ( String text )
+	{
+		if ( WRITE_OUT )
+		{
+			try
+			{
+				FileWriter fstream = new FileWriter ( Constants.LOG_FILE_NAME, true );
+				BufferedWriter out = new BufferedWriter ( fstream );
+				out.write ( text );
+				out.close ( );
+			}
+			catch ( Exception e )
+			{
+				System.err.println ( "Error writing line: " + text );
+				e.printStackTrace ( );
+			}
+		}
+	}
+
+
+
+	/**
+	 * Finds the current time and returns the string object representing it.
+	 * 
+	 * @return The current time as a String with the format given by Constants.DATE_FORMAT
+	 */
+
+	private static String currentTime ( )
+	{
+		DateFormat dateFormat = new SimpleDateFormat ( Constants.DATE_FORMAT );
+		Date date = new Date ( );
+		return dateFormat.format ( date );
+	}
+
+
+
+	/**
+	 * Formats the output of the message in the following manner:
+	 * 
+	 * [TAG] ([LEVEL]) {TAB CHARACTER}:{TAB CHARACTER} [MESSAGE]
+	 * 
+	 * @param importanceLevel
+	 *             The level of importance this information is given
+	 * @param tag
+	 *             The tag for the given information
+	 * @param message
+	 *             The main information to be logged
+	 * @return The formatted message as one String object
+	 */
+
+	private static String formatOutput ( int importanceLevel, String tag, Object message )
+	{
+		return formatTag ( tag ) + " (" + levelConverter ( importanceLevel ) + ")" + " \t:\t " + message;
+	}
+
+
+
+	/**
+	 * Formats the tag by making sure all tags contain the same number of characters.
+	 * 
+	 * @param tag
+	 *             The Original string representing the tag
+	 * @return The formatted String object with the length given by Constants.TAG_LENGTH
+	 */
+
+	private static String formatTag ( String tag )
+	{
+		char [] formatted = new char [ Math.max ( tag.length ( ), Constants.TAG_LENGTH ) ];
+
+		Arrays.fill ( formatted, ' ' );
+		System.arraycopy ( tag.toCharArray ( ), 0, formatted, 0, tag.length ( ) );
+
+		return String.copyValueOf ( formatted );
+	}
+
+
+
+	/**
+	 * Formats the thread name in the log by making sure all thread names are of the same length.
+	 * 
+	 * @param threadName
+	 *             The original String object representing the thread name
+	 * @return The formatted String object with the length given by Constants.THREAD_LENGTH
+	 */
+
+	private static String formatThreadName ( String threadName )
+	{
+		char [] formatted = new char [ Math.max ( threadName.length ( ), Constants.THREAD_LENGTH ) ];
+
+		Arrays.fill ( formatted, ' ' );
+		System.arraycopy ( threadName.toCharArray ( ), 0, formatted, 0, threadName.length ( ) );
+
+		return String.copyValueOf ( formatted );
+	}
+
+
+
+	/**
+	 * Converts the integer representation of the level of importance to the String representation of the level of importance.
+	 * 
+	 * @param l
+	 *             The integer representing the importance level
+	 * @return The string representing the importance level
+	 */
+
+	private static String levelConverter ( int l )
+	{
+		return l == V ? "V" : l == D ? "D" : l == I ? "I" : l == E ? "E" : l == WTF ? "WTF" : ( "" + l );
+	}
+
+
+
+	/**
+	 * Initializes the logger by resetting the text in the log file.
+	 */
+
+	public static void init ( )
+	{
+		try
+		{
+			FileWriter fstream = new FileWriter ( Constants.LOG_FILE_NAME, false );
+			BufferedWriter out = new BufferedWriter ( fstream );
+			out.write ( "" );
+			out.close ( );
+		}
+		catch ( Exception e )
+		{
+			System.err.println ( "Error initializing log file." );
+		}
+	}
+}

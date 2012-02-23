@@ -1,0 +1,89 @@
+
+package model.entities.blocks;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.TreeSet;
+
+
+public class BlockCollection implements Iterable < Block >
+{
+	private ArrayList < Block >	blocks;
+
+	private TreeSet < Block >	blockViews;
+
+
+
+	public BlockCollection ( )
+	{
+		blocks = new ArrayList < Block > ( 1 );
+		
+		blockViews = new TreeSet < Block > (
+				new Comparator < Block > () {
+
+			@Override
+			public int compare ( Block b1, Block b2 )
+			{	
+				b1.zValue ( ) - b2.zValue ( );
+			}
+			
+		});
+	}
+
+
+
+	public int size ( )
+	{
+		return blocks.size ( );
+	}
+
+
+
+	@Override
+	public Iterator < Block > iterator ( )
+	{
+		return blocks.iterator ( );
+	}
+
+
+
+	public boolean contains ( Class < Block > blockType )
+	{
+		for (Block b : blocks)
+			if ( blockType.isAssignableFrom ( b.getClass ( ) ) )
+				return true;
+		return false;
+	}
+
+
+
+	public void addBlock ( Block block )
+	{
+		blocks.add ( block );
+	}
+
+
+
+	public ArrayList < Block > getBlocks ( )
+	{
+		return blocks;
+	}
+
+
+
+	public boolean containsBlockWithCharacteristic ( BlockAttributes attribute )
+	{
+		for (Block b : blocks)
+			if ( b.getAttributes ( ).contains ( attribute ) )
+				return true;
+		return false;
+	}
+
+
+
+	public void clear ( )
+	{
+		blocks.clear ( );
+	}
+}

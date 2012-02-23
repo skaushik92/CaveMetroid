@@ -1,0 +1,31 @@
+
+package model.managers;
+
+import java.util.HashMap;
+
+import controller.input.keyboard.Key;
+
+
+public class ButtonManager
+{
+	public enum Action
+	{
+		Jump, Left, Right, Inspect, LookUp, LookDown, LocalMap, WorldMap, WeaponSelectLeft, 
+	}
+
+
+	public static HashMap < Action , Key >	actionToButtonMap;
+
+	static
+	{
+		actionToButtonMap = new HashMap < Action , Key > ( );
+
+	}
+
+
+
+	public static void map ( Key k, Action a )
+	{
+		actionToButtonMap.put ( a, k );
+	}
+}

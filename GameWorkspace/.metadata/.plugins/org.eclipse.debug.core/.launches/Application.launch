@@ -8,4 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="Application"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="CaveMetroid"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2048M"/>
 </launchConfiguration>

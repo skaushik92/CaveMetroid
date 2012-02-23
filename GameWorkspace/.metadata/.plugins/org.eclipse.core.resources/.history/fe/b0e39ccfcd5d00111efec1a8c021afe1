@@ -1,0 +1,20 @@
+
+package model;
+
+import java.awt.Font;
+
+
+public class Constants
+{
+	public static final long		serialVersionUID	= application.Constants.serialVersionUID;
+
+	public static final Font		DEFAULT_TEXT_FONT	= new Font ( "Helvetica", Font.PLAIN, 12 );
+
+	public static final String	DEFAULT_FONT_NAME	= "Helvetica";
+	public static final int		DEFAULT_FONT_SIZE	= 12;
+
+	public static final double	MAX_ELAPSED_TIME	= 0.10;
+
+	public static final int		BLOCK_WIDTH		= 50;
+	public static final int		BLOCK_HEIGHT		= 50;
+}

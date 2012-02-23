@@ -1,0 +1,298 @@
+
+package model.entities.gameentities;
+
+import io.ContentManager;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import log.Log;
+import model.Constants;
+import model.GameState;
+import model.entities.CollidableEntity;
+import model.entities.EntityAttributes;
+import model.entities.ViewableEntity;
+import model.entities.blocks.BlockAttributes;
+import model.entities.blocks.BlockCoordinate;
+import model.entities.blocks.BlockManager;
+import model.graphics.Animation;
+import model.graphics.Sprite;
+import model.physics.Force;
+import model.physics.Position;
+import model.physics.Vector;
+import model.physics.collision.CollisionShape;
+import model.time.GameTime;
+import controller.input.InputChange;
+
+
+/**
+ * All game entities have the following characteristics: - Have an Animation (but can be just one frame) - Have a Position (but can be unchanging) -
+ */
+
+public abstract class AbstractGameEntity implements ViewableEntity, CollidableEntity
+{
+
+	/**
+	 * Physics variables
+	 */
+
+	private static final Force			GRAVITY			= new Force ( 0, -100.0f );
+
+	protected Position					myPosition;
+	protected Vector					myVelocity;
+	protected Vector					myAcceleration;
+	protected List < Force >				appliedForces;
+	protected float					myMass;
+
+	/**
+	 * Animation variables
+	 */
+
+	private static final String			DEFAULT_ANIMATION	= "error";
+	protected Animation					currentAnimation;
+	protected Map < String , Animation >	myAnimations;
+
+
+
+	protected AbstractGameEntity ( )
+	{
+
+		/*
+		 * Initializing Physics instance variables
+		 */
+
+		myPosition = Position.ZERO;
+		myVelocity = Vector.ZERO;
+		myAcceleration = Vector.ZERO;
+
+		appliedForces = new LinkedList < Force > ( );
+
+		if ( entityAttributes ( ).contains ( EntityAttributes.Physical ) )
+			appliedForces.add ( GRAVITY );
+
+		myMass = 1;
+
+		/*
+		 * Initializing Animation instance variables
+		 */
+
+		currentAnimation = ContentManager.loadAnimation ( DEFAULT_ANIMATION );
+		myAnimations = new HashMap < String , Animation > ( );
+		myAnimations.put ( DEFAULT_ANIMATION, ContentManager.loadAnimation ( DEFAULT_ANIMATION ) );
+	}
+
+
+
+	@Override
+	public void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
+	{
+		EnumSet < EntityAttributes > attrs = entityAttributes ( );
+		float seconds = gameTime.getElapsedTime ( ).getSeconds ( );
+
+		/*
+		 * Updating physics
+		 */
+
+		if ( attrs.contains ( EntityAttributes.Physical ) )
+		{
+
+			for (Force f : appliedForces)
+				f.update ( gameTime, inputChange, gameState );
+
+			Force resultantForce = Force.sum ( appliedForces );
+
+			myAcceleration = resultantForce.getForceVector ( );
+
+			if ( attrs.contains ( ( EntityAttributes.Ground_Collidable ) ) )
+			{
+				/*
+				 * Checking for collision with ground blocks.
+				 */
+
+				BlockManager.coordinateAtWorldPosition ( myPosition );
+
+				/*
+				 * Checking each direction!
+				 */
+
+				// UP
+				if ( myVelocity.getY ( ) > 0 )
+				{
+
+				}
+				// DOWN
+				if ( myVelocity.getY ( ) < 0 )
+				{
+					Position leftBottom = new Position ( leftMostX ( ), bottomMostY ( ) + myVelocity.scale ( seconds ).getY());
+					Position rightBottom = new Position ( rightMostX ( ), bottomMostY ( ) );
+
+					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
+					BlockCoordinate currentClosestRightLowerboundY = BlockManager.coordinateAtWorldPosition ( rightBottom );
+
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getCol ( ) <= currentClosestRightLowerboundY.getCol ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ) + 1, bCoord.getRow ( ) ))
+					{
+
+						int currCol = bCoord.getCol ( );
+						int currRow = bCoord.getRow ( );
+
+						if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) )
+						{
+							Log.v ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+							myVelocity = new Vector ( myVelocity.getX ( ), 0 );
+
+							/*
+							 * To compute the correct X component of the player's position, we do the following:
+							 * 
+							 * 1. Find the x coordinate of the first open pixel to the right of the collided object.
+							 * 
+							 * 2. Find the how much we should shift our entity to make the entity's left edge just touch the collided object.
+							 * 
+							 * step 1 is done by: ( currCol + 1 ) * 50
+							 * 
+							 * step 2 is done by: myPosition.getX() - leftMostX()
+							 */
+
+							float newY = ( currRow + 1 ) * Constants.BLOCK_HEIGHT + ( myPosition.getY ( ) - bottomMostY ( ) );
+
+							myPosition = new Position ( myPosition.getX ( ), newY );
+						}
+					}
+				}
+				// RIGHT
+				if ( myVelocity.getX ( ) > 0 )
+				{
+
+				}
+				// LEFT
+				if ( myVelocity.getX ( ) < 0 )
+				{
+					Position leftTop = new Position ( leftMostX ( ) + myVelocity.scale ( seconds ).getX ( ), topMostY ( ) );
+					Position leftBottom = new Position ( leftMostX ( ) + myVelocity.scale ( seconds ).getX ( ), bottomMostY ( ) );
+
+					BlockCoordinate currentClosestLeftUpperboundY = BlockManager.coordinateAtWorldPosition ( leftTop );
+					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
+
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getRow ( ) <= currentClosestLeftUpperboundY.getRow ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ), bCoord.getRow ( ) + 1 ))
+					{
+
+						int currCol = bCoord.getCol ( );
+						int currRow = bCoord.getRow ( );
+
+						if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) )
+						{
+							Log.v ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
+							myVelocity = new Vector ( 0, myVelocity.getY ( ) );
+
+							/*
+							 * To compute the correct X component of the player's position, we do the following:
+							 * 
+							 * 1. Find the x coordinate of the first open pixel to the right of the collided object.
+							 * 
+							 * 2. Find the how much we should shift our entity to make the entity's left edge just touch the collided object.
+							 * 
+							 * step 1 is done by: ( currCol + 1 ) * 50
+							 * 
+							 * step 2 is done by: myPosition.getX() - leftMostX()
+							 */
+
+							float newX = ( currCol + 1 ) * Constants.BLOCK_WIDTH + ( myPosition.getX ( ) - leftMostX ( ) );
+
+							myPosition = new Position ( newX, myPosition.getY ( ) );
+						}
+					}
+				}
+			}
+
+			myPosition = myPosition.plus ( myVelocity.scale ( seconds ) );
+			myVelocity = myVelocity.plus ( myAcceleration.scale ( seconds ) );
+		}
+
+		/*
+		 * Updating animation
+		 */
+
+		currentAnimation.moveForward ( seconds );
+	}
+
+
+
+	public abstract boolean shouldDestroy ( );
+
+
+
+	public abstract EnumSet < EntityAttributes > entityAttributes ( );
+
+
+
+	protected void loadAnimation ( String animationName )
+	{
+		if ( !myAnimations.containsKey ( animationName ) )
+			myAnimations.put ( animationName, ContentManager.loadAnimation ( animationName ) );
+	}
+
+
+
+	protected void setAnimation ( String animationName )
+	{
+		if ( currentAnimation.getAnimationName ( ).equals ( animationName ) )
+			return;
+
+		if ( !myAnimations.containsKey ( animationName ) )
+			loadAnimation ( animationName );
+
+		currentAnimation = myAnimations.get ( animationName );
+		currentAnimation.reset ( );
+	}
+
+
+
+	@Override
+	public Position getPosition ( )
+	{
+		return myPosition;
+	}
+
+
+
+	@Override
+	public Sprite getSprite ( )
+	{
+		return currentAnimation.getCurrentSprite ( );
+	}
+
+
+
+	@Override
+	public abstract CollisionShape getCollisionShape ( );
+
+
+
+	public float leftMostX ( )
+	{
+		return myPosition.getX ( ) - getCollisionShape ( ).getWidth ( ) / 2;
+	}
+
+
+
+	public float rightMostX ( )
+	{
+		return myPosition.getX ( ) + getCollisionShape ( ).getWidth ( ) / 2;
+	}
+
+
+
+	public float topMostY ( )
+	{
+		return myPosition.getY ( ) + getCollisionShape ( ).getHeight ( ) / 2;
+	}
+
+
+
+	public float bottomMostY ( )
+	{
+		return myPosition.getY ( ) - getCollisionShape ( ).getHeight ( ) / 2;
+	}
+}
