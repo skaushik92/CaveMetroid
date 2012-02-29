@@ -14,7 +14,6 @@ import model.entities.Entity;
 import model.managers.ButtonManager;
 import model.time.GameTime;
 import controller.input.InputChange;
-import controller.input.keyboard.Key;
 
 
 public class FullScreenEntity implements Entity

@@ -1,0 +1,5 @@
+*.DS_Store
+GameWorkspace/.metadata
+GameWorkspace/.settings
+GameWorkspace/.plugins
+*.class

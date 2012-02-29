@@ -34,4 +34,18 @@ public class BlockCoordinate
 	{
 		return "BlockCoordinate: (" + col + ", " + row + ")";
 	}
+
+
+
+	public void setCol ( int newCol )
+	{
+		col = newCol;
+	}
+
+
+
+	public void setRow ( int newRow )
+	{
+		row = newRow;
+	}
 }

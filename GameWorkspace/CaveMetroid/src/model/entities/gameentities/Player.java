@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.util.EnumSet;
 
 import controller.input.InputChange;
-import controller.input.keyboard.Key;
 import controller.input.keyboard.KeyState;
 import log.Log;
 import model.Action;
@@ -15,7 +14,11 @@ import model.GameState;
 import model.entities.EntityAttributes;
 import model.graphics.Sprite;
 import model.managers.ButtonManager;
+import model.managers.EntityManager;
+import model.physics.DecayingForce;
+import model.physics.Force;
 import model.physics.Position;
+import model.physics.TemporaryForce;
 import model.physics.Vector;
 import model.physics.collision.CollisionShape;
 import model.time.GameTime;
@@ -32,18 +35,18 @@ public class Player extends AbstractGameEntity
 
 	private static final long			serialVersionUID		= Constants.serialVersionUID;
 
-	private static final float			DEFAULT_SPEED			= 100.0f;
+	private static final float			DEFAULT_SPEED			= 200.0f;
 
 	private static final float			CHARGE_DURATION		= 1.0f;
-	private static final float			JUMP_TIME				= 0.5f;
-	private static final float			JUMP_CONSTANT			= 500;
+
+	private static final float			MAX_HOLD_TIME			= 0.2f;
 
 	private boolean					charging;
 	private boolean					movingRight;
 	private boolean					jumping;
+	private TemporaryForce				jumpForce;
 
 	private TimeInstant					chargeStartTime;
-
 	private TimeInstant					jumpStartTime;
 
 
@@ -145,27 +148,36 @@ public class Player extends AbstractGameEntity
 		/*
 		 * Handles player's jumping capabilities
 		 */
-
-		if ( !jumping && inputChange.justPressed ( ButtonManager.get ( Action.Jump ) ) )
-		{
-			jumping = true;
-			jumpStartTime = gameTime.getCurrentTime ( );
-
-			myVelocity.setY ( myVelocity.getY ( ) + JUMP_CONSTANT );
-		}
-
 		if ( jumping )
 		{
 			float jumpSeconds = gameTime.getTimeFrom ( jumpStartTime ).getSeconds ( );
-			if ( jumpSeconds > JUMP_TIME )
+			/*
+			if ( jumpSeconds < MAX_HOLD_TIME && inputChange.isHeldDown ( ButtonManager.get ( Action.Jump ) ) )
+			{
+			}
+			else {
+				jumpForce.turnOff();
+			}
+			
+			
+			 */
+			jumping = false;
+			/*
+			if ( Math.abs(myVelocity.getY()) < application.Constants.EPSILON )
 			{
 				jumping = false;
 			}
-			else
-			{
-
-			}
+			*/
 		}
+
+		else if ( !jumping && inputChange.justPressed ( ButtonManager.get ( Action.Jump ) ) )
+		{
+			jumping = true;
+			
+			jumpStartTime = gameTime.getCurrentTime ( );
+		
+		}
+
 	}
 
 

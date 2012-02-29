@@ -119,6 +119,42 @@ public class Position
 
 
 
+	public void setAddX ( float dx )
+	{
+		setX ( getX ( ) + dx );
+	}
+
+
+
+	public void setAddY ( float dy )
+	{
+		setY ( getY ( ) + dy );
+	}
+
+
+
+	public void setAdd ( float dx, float dy )
+	{
+		setAddX ( dx );
+		setAddY ( dy );
+	}
+
+
+
+	public void setAddPosition ( Position p )
+	{
+		set ( getX ( ) + p.getX ( ), getY ( ) + p.getY ( ) );
+	}
+
+
+
+	public void setAddVector ( Vector v )
+	{
+		set ( getX ( ) + v.getX ( ), getY ( ) + v.getY ( ) );
+	}
+
+
+
 	// FUNCTIONS
 	public Position minus ( Position anotherPosition )
 	{

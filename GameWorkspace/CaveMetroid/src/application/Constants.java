@@ -8,4 +8,6 @@ public class Constants
 	 * consistency within all classes.
 	 */
 	public static final long	serialVersionUID	= 1L;
+	
+	public static final float EPSILON = 0.01f;
 }

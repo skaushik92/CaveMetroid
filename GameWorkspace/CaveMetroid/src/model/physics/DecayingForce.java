@@ -5,42 +5,51 @@ import controller.input.InputChange;
 import model.GameState;
 import model.entities.Entity;
 import model.time.GameTime;
+import model.time.TimeInstant;
 
 
 public class DecayingForce extends Force implements Entity
 {
 
 	/**
-	 * Degradation means the force is reduced by (1 - factor)%
-	 * every second.
+	 * Degradation means the force is reduced by (1 - factor)% every second.
 	 */
 	public static final float	DEFAULT_DEGRADATION			= 0.2f;
-	public static final float	NEGLIGIBLE_FORCE_MAGNITUDE	= 0.001f;
+	public static final float	NEGLIGIBLE_FORCE_MAGNITUDE	= 1.0f;
 
 	private float				factor;
+
+	private Vector				originalForce;
+	private TimeInstant			startTime;
 
 
 
 	public DecayingForce ( Vector appliedForce )
 	{
 		super ( appliedForce );
+		originalForce = appliedForce;
 		factor = DEFAULT_DEGRADATION;
+		startTime = null;
 	}
 
 
 
-	public DecayingForce ( float x, float y )
+	public DecayingForce ( Float x, Float y )
 	{
 		super ( x, y );
+		originalForce = new Vector ( x, y );
 		factor = DEFAULT_DEGRADATION;
+		startTime = null;
 	}
 
 
 
-	public DecayingForce ( Vector appliedForce, float degradationFactor )
+	public DecayingForce ( Vector appliedForce, Float degradationFactor )
 	{
 		super ( appliedForce );
+		originalForce = appliedForce;
 		this.factor = degradationFactor;
+		startTime = null;
 	}
 
 
@@ -48,8 +57,11 @@ public class DecayingForce extends Force implements Entity
 	@Override
 	public void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
 	{
-		float secs = gameTime.getElapsedTime ( ).getSeconds ( );
-		this.getForceVector ( ).scale ( secs * ( 1 - factor ) );
+		if ( startTime == null )
+			startTime = gameTime.getCurrentTime ( );
+		float secs = gameTime.getTimeFrom ( startTime ).getSeconds ( );
+
+		this.getForceVector ( ).setVector ( originalForce.scale ( 1 - secs * factor ) );
 	}
 
 

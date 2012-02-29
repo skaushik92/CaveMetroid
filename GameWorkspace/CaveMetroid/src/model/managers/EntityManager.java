@@ -26,16 +26,25 @@ public class EntityManager
 
 	private static Map < Class < ? extends Entity > , Set < ? extends Entity >>	byType;
 
+	private static List < Entity >										newlyAdded;
+
 	static
 	{
 		byType = new HashMap < Class < ? extends Entity > , Set < ? extends Entity > > ( );
 		byType.put ( ViewableEntity.class, new TreeSet < ViewableEntity > ( ViewableEntity.viewableEntityComparator ) );
+
+		newlyAdded = new ArrayList < Entity > ( );
 	}
 
 
 
 	public static void update ( GameTime gameTime, InputChange inputChange, GameState gameState )
 	{
+		for (Entity e : newlyAdded)
+			actuallyAddIn ( e );
+
+		newlyAdded.clear ( );
+
 		LinkedList < Entity > toRemove = new LinkedList < Entity > ( );
 
 		Log.v ( "Entity Set Info", "Current Entity Count = " + allOfType ( Entity.class ).size ( ) );
@@ -93,6 +102,25 @@ public class EntityManager
 
 
 	@SuppressWarnings ( { "unchecked", "rawtypes" } )
+	private static < T extends Entity > void actuallyAddIn ( T t )
+	{
+
+		Set < Class < ? extends Entity > > interfaces = new HashSet < Class < ? extends Entity > > ( );
+
+		for (Class c = t.getClass ( ); c != Object.class; c = c.getSuperclass ( ))
+		{
+			interfaces.addAll ( interfaceDecendenceOf ( c ) );
+			allOfType ( c ).add ( t );
+		}
+
+		for (Class c : interfaces)
+		{
+			allOfType ( c ).add ( t );
+		}
+	}
+
+
+
 	public static < T extends Entity > T createEntity ( Class < T > classType, Object... parameters )
 	{
 
@@ -141,18 +169,7 @@ public class EntityManager
 			Log.e ( "Initialization Error", classType + " could not be initialized." );
 		}
 
-		Set < Class > interfaces = new HashSet < Class > ( );
-
-		for (Class c = entity.getClass ( ); c != Object.class; c = c.getSuperclass ( ))
-		{
-			interfaces.addAll ( interfaceDecendenceOf ( c ) );
-			allOfType ( c ).add ( entity );
-		}
-
-		for (Class c : interfaces)
-		{
-			allOfType ( c ).add ( entity );
-		}
+		newlyAdded.add ( entity );
 
 		Log.v ( "Current Entity Map", byType );
 

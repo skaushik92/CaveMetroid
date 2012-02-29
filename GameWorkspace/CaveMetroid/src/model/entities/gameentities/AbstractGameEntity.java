@@ -3,6 +3,7 @@ package model.entities.gameentities;
 
 import io.ContentManager;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -98,9 +99,16 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 
 		if ( attrs.contains ( EntityAttributes.Physical ) )
 		{
-
-			for (Force f : appliedForces)
+			
+			List < Force > toRemove = new ArrayList < Force > ();
+			for (Force f : appliedForces) {
 				f.update ( gameTime, inputChange, gameState );
+				if (f.shouldDestroy ( ))
+					toRemove.add ( f );
+			}
+			
+			appliedForces.removeAll ( toRemove );
+			toRemove.clear();
 
 			Force resultantForce = Force.sum ( appliedForces );
 
@@ -132,13 +140,13 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
 					BlockCoordinate currentClosestRightLowerboundY = BlockManager.coordinateAtWorldPosition ( rightBottom );
 
-					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getCol ( ) <= currentClosestRightLowerboundY.getCol ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ) + 1, bCoord.getRow ( ) ))
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getCol ( ) <= currentClosestRightLowerboundY.getCol ( ); bCoord.setCol ( bCoord.getCol ( ) + 1 ))
 					{
 
 						int currCol = bCoord.getCol ( );
 						int currRow = bCoord.getRow ( );
 
-						if ( BlockManager.validCoordinate ( currCol, currRow ) && BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) )
+						if ( BlockManager.validCoordinate ( currCol, currRow ) && ( BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Full_Collidable ) || BlockManager.containsBlockOfTypeAt ( currCol, currRow, BlockAttributes.Top_Collidable ) ) )
 						{
 							Log.v ( "Collision Information", "Collided with a block at (" + currCol + ", " + currRow + ")" );
 
@@ -176,7 +184,7 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 					BlockCoordinate currentClosestLeftUpperboundY = BlockManager.coordinateAtWorldPosition ( leftTop );
 					BlockCoordinate currentClosestLeftLowerboundY = BlockManager.coordinateAtWorldPosition ( leftBottom );
 
-					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getRow ( ) <= currentClosestLeftUpperboundY.getRow ( ); bCoord = new BlockCoordinate ( bCoord.getCol ( ), bCoord.getRow ( ) + 1 ))
+					for (BlockCoordinate bCoord = currentClosestLeftLowerboundY; bCoord.getRow ( ) <= currentClosestLeftUpperboundY.getRow ( ); bCoord.setRow ( bCoord.getRow ( ) + 1 ))
 					{
 
 						int currCol = bCoord.getCol ( );
@@ -207,8 +215,9 @@ public abstract class AbstractGameEntity implements ViewableEntity, CollidableEn
 				}
 			}
 
-			myPosition = myPosition.plus ( myVelocity.scale ( seconds ) );
-			myVelocity = myVelocity.plus ( myAcceleration.scale ( seconds ) );
+			myPosition.setAddVector ( myVelocity.scale ( seconds ) );
+
+			myVelocity.setAddVector ( myAcceleration.scale ( seconds ) );
 		}
 
 		/*
